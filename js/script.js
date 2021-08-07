@@ -58,13 +58,30 @@ console.log(strFio);
 
 //2
 
-objInfo = {
-        averageAge:  (arr.reduce((acc, currentUser) => acc += currentUser.age, 0)) / arr.length,
-        overThirty: arr.filter((currentUser) => currentUser.age > 30).length,
-        overForty: arr.filter((currentUser) => currentUser.age > 40).length,
-        overEighteen: arr.filter((currentUser) => currentUser.age > 18).length,
-}
-console.log(objInfo);
+objInfo = arr.reduce(
+    ({averageAge, overThirty, overForty, overEighteen}, {age}, index) => {
+        const {length: arrLength} = arr
+        const isLastUser = index + 1 === arrLength;
+        return{
+            averageAge: isLastUser ? (averageAge + age) / arrLength : averageAge + age,
+            overThirty: age > 30 ? overThirty + 1 : overThirty,
+            overForty: age > 40 ? overForty + 1 : overForty,
+            overEighteen: age > 18 ? overEighteen + 1 : overEighteen,
+        }
+    },{
+        averageAge: 0, 
+        overThirty: 0,
+        overForty: 0,
+        overEighteen: 0,
+    });
+    console.log(objInfo)
+// objInfo = {
+//         averageAge:  (arr.reduce((acc, currentUser) => acc += currentUser.age, 0)) / arr.length,
+//         overThirty: arr.filter((currentUser) => currentUser.age > 30).length,
+//         overForty: arr.filter((currentUser) => currentUser.age > 40).length,
+//         overEighteen: arr.filter((currentUser) => currentUser.age > 18).length,
+// }
+// console.log(objInfo);
 
 // 3. 
 
@@ -105,3 +122,11 @@ lastnameObj = arr.reduce((acc, currentUser) => {
 }, {});
 
 console.log(lastnameObj)
+
+// const euros = [29.76, 41.85, 46.5];
+// const doubled = euros.reduce((total, amount) => {
+//     console.log(total)
+//     console.log(amount)
+//   return [...total, amount * 2 ]
+// }, []);
+//   console.log(doubled)

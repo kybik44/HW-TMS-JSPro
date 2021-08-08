@@ -126,10 +126,38 @@ filmInfo = mainArray.reduce((total, {id, title, released, plot}) => {
 }, []);
 
 // 5. Создать объект, где ключ это имя актера, а значение - массив из фильмов с его участием
-let actorsInfo = mainArray.reduce((total, {title, actors}) => {
-    return [...total, {[title]: actors}]
-}, []);
 
+// id: 3,
+//         title: "Star Wars",
+//         year: 1977,
+//         released: "25 May 1977",
+//         actors: ["Mark Hamill", "Harrison Ford", "Carrie Fisher"],
+//         plot: "Luke Skywalker joins forces with a Jedi Knight, a cocky pilot, a Wookiee and two droids to save the galaxy from the Empire's world-destroying battle station, while also attempting to rescue Princess Leia from the mysterious Darth Vad",
+   
+let actorsInfo = mainArray
+    .reduce((total, {title, actors}) => {
+    return [...total, {title, actors}]
+    }, [])
+    .reduce((total, currObj, i, arr)=>{
+        let actorsArr = arr.map(el => el.actors).flat(Infinity).filter((el, i, arr) => (arr.indexOf(el) === i));
+        for(let val of actorsArr){
+            if(currObj.actors.includes(val)){
+                if (total.hasOwnProperty(val)) {
+                    return {
+                      ...total,
+                      [val]: [...total[val], currObj.title],
+                    };
+                  }  
+                   return {
+                    ...total, [val]: [currObj.title]
+                   }
+            }  
+        }
+    }, {}) 
+;
+
+
+    console.log(actorsInfo)
 // 6. Создать массив авторов (поле writer) без повторений.
 
 writerArray = mainArray

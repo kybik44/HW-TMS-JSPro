@@ -183,6 +183,22 @@ const searchFilmsByTitlesOrPlot = (filmArray, currentStr) => {
 // Например: передаем `(films, 'title', 'Black Widow')` и на выходе получаем фильм с id=1
 // если передаем `(films, 'year', 2011)` , то получаем фильм с id=2
 
+// const getFilm = (filmArray, fieldName, fieldValue) => {
+//         return filmArray.filter(el => el[fieldName] === fieldValue);
+//     }
+//     console.log(getFilm(mainFilmArray, "title", "Daniel Radcliffe"))
 const getFilm = (filmArray, fieldName, fieldValue) => {
-        return filmArray.filter(el => el[fieldName] === fieldValue);
-    }
+    return filmArray.reduce((total, currentObj) => {
+        if (currentObj[fieldName] === fieldValue) {
+            return { ...total, ...currentObj }
+        }
+        if (Array.isArray(currentObj[fieldName])) {
+            if(currentObj[fieldName].includes(fieldValue)){
+                return {...total, ...currentObj}
+            }
+        }
+        console.log(total)
+        return total
+    }, {});
+}
+    console.log(getFilm(mainFilmArray, "actors", "Daniel Radcliffe"))

@@ -75,6 +75,7 @@ const mainFilmArray = [{
         production: "Heyday Films, Warner Bros.",
     },
     {
+        id: 5,
         title: "Harry Potter and the Sorcerer's Stone",
         year: 2001,
         released: "16 Nov 2001",
@@ -190,15 +191,14 @@ const searchFilmsByTitlesOrPlot = (filmArray, currentStr) => {
 const getFilm = (filmArray, fieldName, fieldValue) => {
     return filmArray.reduce((total, currentObj) => {
         if (currentObj[fieldName] === fieldValue) {
-            return { ...total, ...currentObj }
+            return [ ...total, currentObj ]
         }
         if (Array.isArray(currentObj[fieldName])) {
             if(currentObj[fieldName].includes(fieldValue)){
-                return {...total, ...currentObj}
+                return [...total, currentObj]
             }
         }
-        console.log(total)
         return total
-    }, {});
+    }, []);
 }
-    console.log(getFilm(mainFilmArray, "actors", "Daniel Radcliffe"))
+    console.log(getFilm(mainFilmArray, "title", "Black Widow"))

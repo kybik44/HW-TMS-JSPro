@@ -1,4 +1,4 @@
-let mainArray = [{
+const mainFilmArray = [{
         id: 1,
         title: "Black Widow",
         year: 2021,
@@ -97,15 +97,18 @@ let mainArray = [{
 
 //     1. Собрать в массив все жанры фильмов (без повторения)
 
-filmArray = mainArray
-    .reduce((total, { genre }) => {
-    return total.includes(genre) ? total : [...total, ...genre];
-}, [])
-    .filter((el, i, arr) => (arr.indexOf(el) === i));
+const genreList = mainFilmArray.reduce((total, { genre }) => {
+    return Array.from(new Set([...total, ...genre]));
+  }, []);
+
+//     .reduce((total, { genre }) => {
+//     return total.includes(genre) ? total : [...total, ...genre];
+// }, [])
+//     .filter((el, i, arr) => (arr.indexOf(el) === i));
 
 // 2. Собрать в массив всех актеров всех фильмов (без повторения)
 
-actorArray = mainArray
+const actorList = mainFilmArray
     .reduce((total, { actors }) => {
     return total.includes(actors) ? total : [...total, ...actors];
 }, [])
@@ -114,42 +117,35 @@ actorArray = mainArray
 
 // 3. Отсортировать фильмы по рейтингу по убыванию
 
-raitingFilm = mainArray
+const raitingFilm = mainFilmArray
     .sort((a, b) => b.imdbRating - a.imdbRating)
     .map(el => `${el.title} c рейтингом ${el.imdbRating}`)
 
 // 4. Создать новый массив, где объекты фильмов будут состоять из следующих полей: 
 //     `id, title, released, plot`
 
-filmInfo = mainArray.reduce((total, {id, title, released, plot}) => {
+const filmInfo = mainFilmArray.reduce((total, {id, title, released, plot}) => {
     return [...total, { id, title, released, plot }]
 }, []);
 
 // 5. Создать объект, где ключ это имя актера, а значение - массив из фильмов с его участием
 
-// id: 3,
-//         title: "Star Wars",
-//         year: 1977,
-//         released: "25 May 1977",
-//         actors: ["Mark Hamill", "Harrison Ford", "Carrie Fisher"],
-//         plot: "Luke Skywalker joins forces with a Jedi Knight, a cocky pilot, a Wookiee and two droids to save the galaxy from the Empire's world-destroying battle station, while also attempting to rescue Princess Leia from the mysterious Darth Vad",
-   
-let actorsInfo = mainArray
+const actorsInfo = mainFilmArray
     .reduce((total, {title, actors}) => {
     return [...total, {title, actors}]
     }, [])
-    .reduce((total, currObj, i, arr)=>{
+    .reduce((total, currentObj, i, arr)=>{
         let actorsArr = arr.map(el => el.actors).flat(Infinity).filter((el, i, arr) => (arr.indexOf(el) === i));
         for(let val of actorsArr){
-            if(currObj.actors.includes(val)){
+            if(currentObj.actors.includes(val)){
                 if (total.hasOwnProperty(val)) {
                     return {
                       ...total,
-                      [val]: [...total[val], currObj.title],
+                      [val]: [...total[val], currentObj.title],
                     };
                   }  
                    return {
-                    ...total, [val]: [currObj.title]
+                    ...total, [val]: [currentObj.title]
                    }
             }  
         }
@@ -157,35 +153,28 @@ let actorsInfo = mainArray
 ;
 
 
-    console.log(actorsInfo)
 // 6. Создать массив авторов (поле writer) без повторений.
 
-writerArray = mainArray
-     .map(el => el.writer).flat(Infinity).filter((el, i, arr) => (arr.indexOf(el) === i));
+const writerArray = mainFilmArray
+     .map(el => el.writer).flat(Infinity).join(', ').split(", ").filter((el, i, arr) => arr.indexOf(el) === i);
 
 // 7. Создать функцию, которая бы принимала массив фильмов и строку. А результатом этой функции должен быть новый отфильтрованный массив, с фильмами, где строка входит в название фильма.
     
-    function getFilmsTitles(filmArray, currStr){
-        return filmArray.filter(({title}) => title.indexOf(currStr) > -1)
-    
+const getFilmsTitles = (filmArray, searchingStr) => {
+        return filmArray.filter(({title}) => title.toLowerCase().indexOf(searchingStr.toLowerCase()) > -1)
     }
-    
 
 // 8. Создать функцию, которая бы принимала массив фильмов и число. А результатом этой функции должен быть отфильтрованный массив, с фильмами где число равно году выхода фильма.
     
-    function getFilmsYear(filmArray, currYear){
-        return filmArray.reduce((total, {title, year}) => {
-            if(year === currYear){
-                return [ ...total,{ [title]: year } ]
-            }
-         return total;
-        }, [])
+const getFilmsYear = (filmArray, currentYear) => {
+     return filmArray.filter(({year}) => year === +currentYear);
     }
     
 // 9. Создать функцию, которая бы принимала массив фильмов и строку. А результатом этой функции должен быть отфильтрованный массив, с фильмами где строка входит в название фильма или в его сюжет.
 
-    function checkFilmsTitlesOrPlot(filmArray, currStr){
-        return filmArray.filter(({title, plot}) => ((title.indexOf(currStr) > -1) || (plot.indexOf(currStr) > -1)))
+const searchFilmsByTitlesOrPlot = (filmArray, currentStr) => {
+        let currentStrLowerCase = currentStr.toLowerCase()
+        return filmArray.filter(({title, plot}) => ((title.toLowerCase().indexOf(currentStrLowerCase) > -1) || (plot.toLowerCase().indexOf(currentStrLowerCase) > -1)))
     }
 
 // 10. Создать функцию, которая бы принимала 3 параметра:  1)массив фильмов , 2) строка(название поля, например 'title') 
@@ -194,6 +183,6 @@ writerArray = mainArray
 // Например: передаем `(films, 'title', 'Black Widow')` и на выходе получаем фильм с id=1
 // если передаем `(films, 'year', 2011)` , то получаем фильм с id=2
 
-    function getFilm(filmArray, prop, searchStr){
-        return filmArray.filter(el => el[prop] === searchStr);
+const getFilm = (filmArray, fieldName, fieldValue) => {
+        return filmArray.filter(el => el[fieldName] === fieldValue);
     }

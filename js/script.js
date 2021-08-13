@@ -131,40 +131,17 @@ const filmInfo = mainFilmArray.reduce((total, {id, title, released, plot}) => {
 
 // 5. Создать объект, где ключ это имя актера, а значение - массив из фильмов с его участием
 
-// const actorsInfo = mainFilmArray
-//     .reduce((total, currentObj, i, arr)=>{
-//         let actorsArr = arr.map(el => el.actors).flat(Infinity).filter((el, i, arr) => (arr.indexOf(el) === i));
-//         for(let val of actorsArr){
-//             if(currentObj.actors.includes(val)){
-//                 if (total.hasOwnProperty(val)) {
-//                     console.log(1)
-//                     return { ...total, [val]: [...total[val], currentObj.title] };
-//                   }  
-//                   console.log(2)
-//                 return { ...total, [val]: [currentObj.title] }
-//             }  
-//         }
-//     }, {});
-
-
-const actorsInfo = mainFilmArray
-    .reduce((total, {title, actors}, i, arr)=>{
-            return {
-                ...total, [title]: [...actors]
-            }
-    }, {})
-
-    let newObj = {}
-    for(let key in actorsInfo){
-     for(let val of actorsInfo[key]){
-         if(!newObj.hasOwnProperty(val)){
-            newObj[val] = Array.of(key);
-         }else{
-            newObj[val].push(key);
-            }
-        }   
-    }
-console.log(newObj)
+const actorsInfo = mainFilmArray.reduce(
+    (actors, film) =>
+      film.actors.reduce((acc, actor) => {
+        if (!acc[actor]) {
+          return { ...acc, [actor]: [film] };
+        }
+        return { ...acc, [actor]: [...acc[actor], film] };
+      }, actors),
+  
+    {}
+  );
 
 // 6. Создать массив авторов (поле writer) без повторений.
 
@@ -213,3 +190,7 @@ const getFilm = (filmArray, fieldName, fieldValue) => {
         return total
     }, []);
 }
+
+
+
+console.log(actorsInfo)

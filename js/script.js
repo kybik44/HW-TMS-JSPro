@@ -78,26 +78,37 @@ const eatArray = [{
 
 //    1. Собрать в массив ингредиентов (без повторения).
 
-const ingredientsArray = eatArray.reduce((total, {ingredients}) => {
+const ingredientsArray = eatArray.reduce((total, {
+    ingredients
+}) => {
     return Array.from(new Set([...total, ...ingredients]))
 }, []);
 
 //    2. Создать функцию, которая принимает массив продуктов и id, и возвращает продукт с таким же id.
 const getProducts = (eatArray, searchingId) => {
-    return eatArray.filter(({id}) => id === searchingId);
+    return eatArray.filter(({
+        id
+    }) => id === searchingId);
 };
 
 //    3. Создать массив с отсортированными продуктами по цене.
 const dishArraySortByPrice = eatArray.sort((a, b) => a.price - b.price);
 
 //    4. Сгруппировать продукты по типам. Создать объект, где ключ это тип, а значение - массив с продуктами.
-const dishObjectByType = eatArray.reduce((total, {type, name}) => {
-    if(total.hasOwnProperty(type)){
+const dishObjectByType = eatArray.reduce((total, {
+    type,
+    name
+}) => {
+    if (total.hasOwnProperty(type)) {
         return {
-           ...total, [type]: [...total[type], name]
-        }        
+            ...total,
+            [type]: [...total[type], name]
+        }
     }
-    return {...total, [type]: [name]}
+    return {
+        ...total,
+        [type]: [name]
+    }
 }, {});
 
 //    5. Создать массив с продуктами, которые доступны.
@@ -107,16 +118,20 @@ const availableDishArray = eatArray.filter(dish => dish.available === true);
 //    6. Создать функцию, которая принимает массив продуктов и строку = название ингредиента, и возвращает массив с продуктами, 
 //    где содержится такой ингредиент.
 const getArrayWithSearchingIngridient = (eatArray, ingredient) => {
-    return eatArray.filter(({ingredients}) => ingredients.includes(ingredient));
+    return eatArray.filter(({
+        ingredients
+    }) => ingredients.includes(ingredient));
 };
 
 //    7. Создать функцию, которая принимает массив продуктов и массив ингредиентов, и возвращает массив с продуктами,
 //     где содержатся такие ингредиенты.
 
 const getArrayWithSearchingIngridients = (eatArray, ingredientsArray) => {
-    return eatArray.filter(({ingredients}) => {
+    return eatArray.filter(({
+        ingredients
+    }) => {
         let crossing = ingredients.filter(x => !ingredientsArray.includes(x))
-        if(crossing.length === 0){
+        if (crossing.length === 0) {
             return true;
         }
         return false
@@ -127,7 +142,9 @@ const getArrayWithSearchingIngridients = (eatArray, ingredientsArray) => {
 //    где цена продукта ниже или равна цене из второго аргумента функции.
 
 const getArraySortByPrice = (eatArray, searchingPrice) => {
-    return eatArray.filter(({price}) => (price <= searchingPrice));
+    return eatArray.filter(({
+        price
+    }) => (price <= searchingPrice));
 };
 
 //    9. Создать функцию, которая принимает массив продуктов и массив айдишников, и возвращает строку, 
@@ -135,8 +152,13 @@ const getArraySortByPrice = (eatArray, searchingPrice) => {
 //    Например: `"Биг Тейсти: цена 4€, Картофель по-деревенски: 2$"`
 
 const getPriceString = (eatArray, idArray) => {
-   return eatArray.reduce((total, {id, name, price, currency}) => {
-        if(idArray.includes(id)){
+    return eatArray.reduce((total, {
+        id,
+        name,
+        price,
+        currency
+    }) => {
+        if (idArray.includes(id)) {
             return [...total, `${name}: цена ${price} ${currency}`];
         }
         return total;
@@ -150,9 +172,16 @@ const getPriceString = (eatArray, idArray) => {
 //    Например: `{ euro: 20, usd: 6}`
 
 const getPriceObject = (eatArray, idArray) => {
-    return eatArray.reduce((total, {id, price, currency}) => {
-        if(idArray.includes(id)){
-            return {...total, [currency]: [price]}
+    return eatArray.reduce((total, {
+        id,
+        price,
+        currency
+    }) => {
+        if (idArray.includes(id)) {
+            return {
+                ...total,
+                [currency]: [price]
+            }
         }
         return total
     }, {})
@@ -163,16 +192,19 @@ const getPriceObject = (eatArray, idArray) => {
 //     то мы должны получить сумму в евро и перевести доллары в евро(использовать для этого курс евро/доллар).
 
 const getTotalPrice = (eatArray, idArray) => {
-     const sum = eatArray.reduce((total, {id, price, currency}) => {
-        if(idArray.includes(id)){
-            if(currency === "usd"){
+    const sum = eatArray.reduce((total, {
+        id,
+        price,
+        currency
+    }) => {
+        if (idArray.includes(id)) {
+            if (currency === "usd") {
                 let exchangeRate = 1.18;
-                price = (price/exchangeRate).toFixed(1);
+                price = (price / exchangeRate).toFixed(1);
             }
             return total += +price;
         }
         return total;
     }, 0)
     return `${sum} euro`
-    
 }

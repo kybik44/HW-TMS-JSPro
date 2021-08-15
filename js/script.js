@@ -130,18 +130,15 @@ const getArrayWithSearchingIngridients = (eatArray, ingredientsArray) => {
     return eatArray.filter(({
         ingredients
     }) => {
-        let crossing = ingredients.filter(x => !ingredientsArray.includes(x))
-        if (crossing.length === 0) {
-            return true;
-        }
-        return false
+        const crossing = ingredients.filter(x => !ingredientsArray.includes(x))
+        return crossing.length === 0
     });
 };
 
 //    8. Создать функцию, которая принимает массив продуктов и цену, и возвращает массив продуктов, 
 //    где цена продукта ниже или равна цене из второго аргумента функции.
 
-const getArraySortByPrice = (eatArray, searchingPrice) => {
+const getProductsFilterByPrice = (eatArray, searchingPrice) => {
     return eatArray.filter(({
         price
     }) => (price <= searchingPrice));
@@ -199,8 +196,9 @@ const getTotalPrice = (eatArray, idArray) => {
     }) => {
         if (idArray.includes(id)) {
             if (currency === "usd") {
-                let exchangeRate = 1.18;
-                price = (price / exchangeRate).toFixed(1);
+                const exchangeRate = 1.18;
+                let currentPrice = price;
+                currentPrice = (currentPrice / exchangeRate).toFixed(1);
             }
             return total += +price;
         }
@@ -208,3 +206,5 @@ const getTotalPrice = (eatArray, idArray) => {
     }, 0)
     return `${sum} euro`
 }
+
+console.log(getTotalPrice(eatArray, [1,3,4]))

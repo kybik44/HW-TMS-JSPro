@@ -121,39 +121,43 @@ const userSettings = [{
 
 // 1. Создать массив объектов вида { categoryName: 'burger', products: [...]}. 'burger'  - это наше поле type
 
+const groupProductsByType = products.reduce((acc, product) => {
+    const {
+        type
+    } = product;
+    return {
+        ...acc,
+        [type]: [...(acc[type] || []), product]
+    };
+}, {});
 
-const arrayOfProductCategories = Object.entries(eatArray.reduce((total, {
-    type,
-    name
-}) => {
-    if (!total.hasOwnProperty(type)) {
-        return {
-            ...total,
-            [type]: [name]
-        };
-    }
-    return {
-        ...total,
-        [type]: [...total[type], name]
-    }
-}, [])).map((currentCategory) => {
-    return {
-        ["currentCategory"]: currentCategory[0],
-        ["products"]: currentCategory[1]
-    }
-})
+const productsInfo = Object.entries(groupProductsByType).reduce(
+    (acc, [type, products]) => {
+        return [...acc, {
+            categoryName: type,
+            products
+        }];
+    },
+    []
+);
 
 
 // 2. Основываясь на настройки ингредиента пользователя. Создать функцию, которая вернет продукты,
 //  в которых не содержится запрещенных пользователем ингредиентов.
 
-
-const getPermittedProducts = (eatArray, userSettings) => {
-    const prohibitedIngredients = userSettings
-        .filter(ingredient => !ingredient.active)
-        .map(currentIngredient => currentIngredient.ingredient)
-    return eatArray.reduce((acc, currentProduct) => {
-        return !currentProduct.ingredients.some((el) => prohibitedIngredients.includes(el)) ? [...acc, currentProduct] :
+const filterByUserPreferences = (products, userSettings) => {
+    const userPreferences = userSettings.reduce((acc, {
+        ingredient,
+        active
+    }) => {
+        return !active ? [...acc, ingredient] : acc;
+    }, []);
+    return products.reduce((acc, product) => {
+        const {
+            ingredients
+        } = product;
+        return !ingredients.some((el) => userPreferences.includes(el)) ?
+            [...(acc || []), product] :
             acc;
     }, []);
 };
@@ -163,8 +167,7 @@ const getPermittedProducts = (eatArray, userSettings) => {
 // где продукты пользователя соответствуют предпочтения пользователя по продуктам. 
 // Если в категории нет продуктов после фильтрации по ингредиентам, то такую категорию мы не возвращаем.
 
-
-const arrayOfProductCategoriesByUserSettings = Object.entries(getPermittedProducts(eatArray, userSettings).reduce((total, {
+const arrayOfProductCategoriesByUserSettings = Object.entries(filterByUserPreferences(eatArray, userSettings).reduce((total, {
     type,
     name
 }) => {
@@ -189,30 +192,42 @@ const arrayOfProductCategoriesByUserSettings = Object.entries(getPermittedProduc
 // 4. Создать функцию, которая принимает массив продуктов и строку, и возвращает отфильтрованный массив,
 //  где строка входит в название продукта или ингредиента.
 
-
-const getProductsByNameOrIngridient = (eatArray, searchString) => {
-    return eatArray.filter(({
-        name,
+const getFilterProductsBySubstring = (products, substring) => {
+    return products.filter(({
+        type,
         ingredients
-    }) => (name.includes(searchString.toLowerCase()) || ingredients.join(", ").includes(searchString.toLowerCase())));
-}
+    }) => {
+        if (type.includes(substring) || ingredients.includes(substring)) {
+            return product;
+        }
+    });
+};
 
 
 // 5. Создать функцию, которая принимает **массив продуктов**, **массив ингредиентов**(настройки пользователя по предпочтения)
 //  и **число(цену)**, и возвращает отфильтрованный массив, где цена продукта ниже или равна 3 аргументу и все ингредиенты 
 //  у продукта соответствуют предпочтениям пользователя.
 
-
-const getDesiredProducts = (eatArray, userSettings, userPrice) => {
-    const prohibitedIngredients = userSettings
-        .filter(ingredient => !ingredient.active)
-        .map(currentIngredient => currentIngredient.ingredient)
-    return eatArray
-        .reduce((acc, currentProduct) => {
-            return !currentProduct.ingredients.some((el) => prohibitedIngredients.includes(el)) ? [...acc, currentProduct] :
-                acc;
-        }, [])
-        .filter(({
+const filterProductsByUserPreferenceAndByPrice = (
+    products,
+    userSettings,
+    isCorectPrice
+) => {
+    const userPreferences = userSettings.reduce((acc, {
+        ingredient,
+        active
+    }) => {
+        return !active ? [...acc, ingredient] : acc;
+    }, []);
+    return products.reduce((acc, product) => {
+        const {
+            ingredients,
             price
-        }) => (price <= userPrice));
-}
+        } = product;
+        return !ingredients.some((hasIngredient) =>
+                userPreferences.includes(hasIngredient)
+            ) && price <= isCorectPrice ?
+            [...(acc || []), product] :
+            acc;
+    }, []);
+};
